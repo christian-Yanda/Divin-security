@@ -1,0 +1,59 @@
+
+/* barre laterale */
+
+.barre-laterale {
+    background-color: transparent; /* Couleur de fond */
+    color: white; /* Couleur du texte */
+    padding: 20px;
+    width: 250px;
+    border-right: solid 2px #ccc; /* Bordure droite */
+    height: 100vh; /* Hauteur de la barre latérale */
+
+}
+
+/* style de bouton pour Barre latérale */
+.barre-laterale .btn-brlt {
+    color: white;
+    border: none; /* Pas de bordure */
+    border-radius: 5px; /* Coins arrondis */
+    width: 100%; /* Prend toute la largeur */
+    display: flex; /* Utilisation de flexbox pour l'alignement */
+    align-items: center; /* Aligne les éléments au centre verticalement */
+    justify-content: flex-start; /* Aligne les éléments au début horizontalement */
+    gap: 10px; /* Espace entre l'icône et le texte */
+    font-size: 16px; /* Taille de la police */
+    font-weight: 500; /* Poids de la police */
+    text-decoration: none; /* Pas de soulignement */
+    cursor: pointer; /* Curseur en main */
+    transition: transform 0.2s ease; /* Transition pour l'effet de transformation */
+    padding: 10px; /* Espace intérieur */
+}
+
+.barre-laterale .btn-brlt:hover {
+    transform: scale(1.05); /* Légère augmentation de la taille au survol */
+    color: white; /* Couleur du texte au survol */
+    background-color: #69ab70; /* Couleur de fond au survol */
+    transition: background-color 0.3s ease; /* Transition pour l'effet hover */
+}
+/* Titre du dashboard*/
+.title-dash {
+    padding: 10px; /* Espace intérieur */
+    color: white; /* Couleur du texte */
+    border-bottom: 1px solid #ccc; /* Bordure en bas */
+    font-size: 24px; /* Taille de la police */
+    font-weight: bold; /* Poids de la police */
+    margin-bottom: 20px; /* Espace en dessous du titre */
+    text-align: center; /* Centrer le titre */
+}
+
+/* style contenu principal*/
+.header-principal {
+    display: flex; /* Utilisation de flexbox pour l'alignement */
+    flex-direction: row;
+    align-items: center; /* Aligne les éléments au centre verticalement */
+    justify-content: space-between; /* Espace entre les éléments */
+    background-color: #282d32; /* Couleur de fond */
+    padding: 20px; /* Espace intérieur */
+    border-bottom: 1px solid #ccc; /* Bordure en bas */
+    width: 100%; /* Prend toute la largeur */
+}

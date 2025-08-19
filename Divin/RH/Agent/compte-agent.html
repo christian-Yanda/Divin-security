@@ -1,0 +1,271 @@
+
+
+<?php
+/// Enregistrement client 
+include '../../config/config.php';
+
+$message = '';
+
+// verifier si le formulaire a ete soumis 
+if($_SERVER["REQUEST_METHOD"] === "POST"){
+
+    $nom = trim($_POST['nom']) ; // recuperation nom
+    $postnom = trim($_POST['postnom']) ; // recuperation postnom
+    $pays = trim($_POST['pays']) ; // recuperation pays
+    $ville = trim($_POST['ville']) ; // recuperation ville
+    $telephone  = trim($_POST['telephone']) ; // recuperation telephone
+    $adresse = trim($_POST['adresse-complete']) ; // adresse complete 
+    $email = trim($_POST['email']) ; // recuperation email
+    $pwd = trim($_POST['pwd']) ; // recuperation mot de passe
+    $pwd_confirm = trim($_POST['pwd1']); // recuperation mot de passe confirmation
+    $date_heure = date("Y-m-d H:i:s"); // recuperation date et heure
+    $notification = trim(isset($_POST['is-active-notification']) ? 1:0) ; // accepter ou rejeter les notifications par email
+    
+    // verification si email valide 
+    if (filter_var($email, FILTER_VALIDATE_EMAIL)){
+
+        // verifier l'existance de l'utilisateur
+        $slq_req = $pdo->prepare("SELECT COUNT(*) FROM client WHERE e_mail = :email");
+        $slq_req->bindParam(':email', $email);
+        $slq_req->execute();
+
+        $count = $slq_req->fetchColumn();
+
+        // Hacher le mot de passe 
+        $pass_hash = password_hash($pwd, PASSWORD_BCRYPT);// mot de passe hasher ;
+
+        // test si utilisateur existe 
+        if ( $count > 0) // renvoi un message si l'utilisateur existe deja 
+        {
+            $message = " ⚠️ l'utilisateur avec cet email existe déjà";
+        } else { // renvoi un message si l'utilisateur n'existe pas           
+            
+            //verification mot de passe > 8 carateres
+            if (strlen($pwd) >= 8){
+
+                // verification correspondace mot de passe
+                $isCorretPassword = password_verify($pwd, $pass_hash);
+                
+                if($isCorretPassword)
+                {
+                    if ($pwd === $pwd_confirm) // verification correspondance mot de passe et mot de passe de confirmation
+                    {
+                        // preparer et executer la requette d'insertion 
+                        $sql_requette = "INSERT INTO client (nom_client, postnom_client, e_mail, mot_de_passe, adresse_client, statut_notification, date_creation_cmpt, Id_ville) VALUES (:nom_client,:postnom_client,:e_mail,:mot_de_passe,:adresse_client,:statut_notificat1ion,:date_h, :ville)";
+                        $sql_insertion = $pdo->prepare($sql_requette);    
+                        
+                        // execution de la requette        
+                        $sql_insertion->execute([':nom_client' => $nom ,':postnom_client' => $postnom ,':e_mail' => $email, ':mot_de_passe' => $pass_hash, ':adresse_client' => $adresse, ':statut_notificat1ion' => $notification, ':date_h'=> $date_heure, ':ville' => $ville ]);
+                        header('Location: formulaire-connexion.php');                       
+                    }                                            
+                } 
+            }               
+        }
+    } else{
+        $message = "⚠️ Email invalide";
+    }
+}
+?>
+  
+<!-- PAGE WEB FORMULAIRE INSCRIPTION CLIENT1-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire_enregistrement_client</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            text-align: left;
+            /* Justifie le texte au centre */
+            color: white;
+            /* coloration texte */
+            background-color: #D1D1D1;
+            padding: 10px;            
+        }
+        #match-message, #length-message, #strength {
+            font-size: 10px;
+            margin-top: 5px;
+        }
+        .match {
+            color: green;
+        }
+        .no-match {
+            color: red;
+        }
+
+        #strength {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .weak {
+            color: red;
+        }
+        .medium {
+            color: orange;
+        }
+        .strong {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container d-flex d-flex justify-content-center align-items-center w-50 min-vh-100">
+        <!-- Formulaire enregistrement client-->
+        <form id="register" action="formulaire_inscription_client.php" method="POST" class="w-auto w-xl-50 p-4 rounded shadow " style="background-color:  #1f233b; width: 100%;">
+            <div class="d-flex justify-content-center">
+                <img src="../../logo/logoMediateur.png" alt="logo" class="" width="42">
+            </div>
+            <div class="p-3">
+                <div class="mb-3 mt-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Entrez votre email" name="email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                    <span class=" text-danger" style="font-size: 10px;">
+                        <?php // message php pour signaler les erreur liees a email
+                            if(!empty($message)){
+                                echo $message;
+                            }
+                        ?>
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <label for="pwd" class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="pwd" placeholder="Entrez un mot de passe" name="pwd" value="<?php echo isset($_POST['pwd']) ? htmlspecialchars($_POST['pwd']) : ''; ?>" required>
+                    <div class="d-flex justify-content-between" >
+                        <p id="length-message"></p><!-- message longueur mot de passe -->
+                        <p id="strength"></p><!-- message de securite mot e passe -->
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="pwd" class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" class="form-control" id="pwd1" placeholder="Confirmer le mot d passe" name="pwd1" value="<?php echo isset($_POST['pwd1']) ? htmlspecialchars($_POST['pwd1']) : ''; ?>" required>
+                    <p id="match-message"></p>
+                </div>
+                <div class="d-flex justify-content-center"><button type="submit" class=" btn btn-primary " id="btn-submit">Enregistrer</button></div>
+            </div>           
+        </form>
+    </div>
+      
+
+    <!-- Lien vers Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+</html>
+
+  
+
+    <!-- script js lie au mot de passe comparaison mot de passe  -->
+    <script>
+        const passwordInput = document.getElementById('pwd');
+        const confirmPasswordInput = document.getElementById('pwd1');
+        const matchMessage = document.getElementById('match-message');
+        const form = document.getElementById('register');
+
+        // Vérification en temps réel de la correspondance des mots de passe
+        function checkPasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (confirmPassword === '') {
+                matchMessage.textContent = ''; // Pas de message si le champ de confirmation est vide
+            } else if (password === confirmPassword) {
+                matchMessage.textContent = 'Les mots de passe correspondent.';
+                matchMessage.className = 'match';
+            } else {
+                matchMessage.textContent = 'Les mots de passe ne correspondent pas.';
+                matchMessage.className = 'no-match';
+            }
+        }
+
+        // longueur du mot de passe 
+        function lenghtPassword(){
+            var long = password.value.length ;
+            if ( long < 8){
+                matchMessage0.textContent = "⚠️ le mot de passe doit contenir au moins 8 caractères";
+                matchMessage0.className = 'no-match'
+            }
+        }
+
+        // Ajout des événements pour surveiller les changements
+        passwordInput.addEventListener('input', lenghtPassword);
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        ///
+
+        // Empêche la soumission si les mots de passe ne correspondent pas
+        form.addEventListener('submit', function (event) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                event.preventDefault(); // Annule la soumission
+                alert('Les mots de passe doivent correspondre.');
+            }
+        });
+    </script>
+
+    <!-- script verification longueur mot de passe -->
+    <script>
+        const passwordInput1 = document.getElementById('pwd');
+        const lengthMessage = document.getElementById('length-message');
+        const submitButton = document.getElementById('btn-submit');
+        const minLength = 8; // Longueur minimale requise
+
+        // Vérification en temps réel de la longueur
+        passwordInput1.addEventListener('input', () => {
+            const passwordLength = passwordInput.value.length;
+
+            if (passwordLength >= minLength) {
+                lengthMessage.textContent = '';
+                lengthMessage.className = 'valid'; // Ajout de la classe CSS pour un message vert
+                submitButton.disabled = false; // Activer le bouton
+            } else {
+                lengthMessage.textContent = `Votre mot de passe doit contenir au moins ${minLength} caractères.`;
+                lengthMessage.className = 'no-match'; // Ajout de la classe CSS pour un message rouge
+                submitButton.disabled = true; // Désactiver le bouton
+            }
+        });
+
+        // Verification niveau de securite mot de passe
+        const strengthText = document.getElementById('strength');
+
+        passwordInput1.addEventListener('input', () => {
+            const password = passwordInput1.value;
+            const strength = evaluatePasswordStrength(password);
+
+            if (strength === 'faible') {
+                strengthText.textContent = 'Niveau de sécurité : Faible';
+                strengthText.className = 'weak';
+            } else if (strength === 'moyen') {
+                strengthText.textContent = 'Niveau de sécurité : Moyen';
+                strengthText.className = 'medium';
+            } else if (strength === 'fort') {
+                strengthText.textContent = 'Niveau de sécurité : Fort';
+                strengthText.className = 'strong';
+            } else {
+                strengthText.textContent = 'Niveau de sécurité : ';
+                strengthText.className = '';
+            }
+        });
+
+        function evaluatePasswordStrength(password) {
+            if (password.length < 8) {
+                return 'faible';
+            }
+
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            const criteriaMet = [hasLowerCase, hasUpperCase, hasNumbers, hasSpecialChars].filter(Boolean).length;
+
+            if (criteriaMet === 1) return 'faible';
+            if (criteriaMet === 2 || criteriaMet === 3) return 'moyen';
+            if (criteriaMet === 4) return 'fort';
+
+            return 'faible';
+        }
+    </script>

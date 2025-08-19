@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Creep</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #121212;
+      color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .login-container {
+      max-width: 400px;
+      margin: 80px auto;
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+    .form-control {
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      color: #f8f9fa;
+    }
+    .form-control::placeholder {
+      color: #aaa;
+    }
+    .btn-green {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-google {
+      background-color: #fff;
+      color: #000;
+    }
+    .btn-google img {
+      width: 18px;
+      margin-right: 8px;
+    }
+    a {
+      color: #28a745;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h3 class="text-center mb-4">Se connecter à Creep</h3>
+    <form action="login.php" method="POST">
+      <div class="mb-3">
+        <label for="email" class="form-label">Adresse email</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="ex: nom@email.com" required>
+      </div>
+      <div class="mb-3 position-relative">
+        <label for="password" class="form-label">Mot de passe</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="********" required>       
+      </div>
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-green">Connexion</button>
+      </div>
+      <div class="text-center mb-3">
+        <small>Pas encore inscrit ? <a href="inscription.html">Créer un compte</a></small>
+      </div>
+      <div class="text-center">
+        <p>ou</p>
+        <button type="button" class="btn btn-google w-100">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"> Continuer avec Google
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const passwordField = document.getElementById("password");
+      passwordField.type = passwordField.type === "password" ? "text" : "password";
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
